@@ -1,7 +1,7 @@
 const html = require('choo/html')
 const choo = require('choo')
-
 const app = choo()
+
 app.use(initialState)
 app.route('/', mainView)
 app.mount('body')
@@ -13,6 +13,10 @@ function mainView (state, emit) {
     emit('videoClick', vId)
   }
 
+  function onYouTubeIframeAPIReady () {
+    console.log('typeof: ', typeof YT.Player)
+  }
+
   return html`
     <body>
       <h1>hello world</h1>
@@ -21,7 +25,7 @@ function mainView (state, emit) {
       <ul>
         <li onclick=${videoClick}>vid 1</li>
         <li onclick=${videoClick}>vid 2</li>
-        <li onclick=${videoClick}>vid 3</li>
+        <li onclick=${onYouTubeIframeAPIReady}>vid 3</li>
       </ul>
     </body>
   `
