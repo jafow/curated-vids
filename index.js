@@ -1,3 +1,4 @@
+/* global YT */
 const html = require('choo/html')
 const choo = require('choo')
 const app = choo()
@@ -13,20 +14,39 @@ function mainView (state, emit) {
     emit('videoClick', vId)
   }
 
-  function onYouTubeIframeAPIReady () {
-    console.log('typeof: ', typeof YT.Player)
+  var player
+  window.onYouTubeIframeAPIReady = function onYouTubeIframeAPIReady() {
+    console.log('iddframe api read');
+    player = new YT.Player('player', {
+      height: '390',
+      width: '640',
+      videoId: 'M7lc1UVf-VE',
+      events: {
+        'onReady': onPlayerReady,
+        'onStateChange': onPlayerStateChange
+      }
+    })
+    console.log('player is: ', player)
   }
 
+  function onPlayerReady (event) {
+    console.log('ready freddie')
+    event.target.playVideo()
+  }
+  function onPlayerStateChange () {
+    console.log('player stae change')
+  }
   return html`
     <body>
       <h1>hello world</h1>
       <h2>${state.message}</h2>
       <h3>${state.currentVideo}</h3>
       <ul>
-        <li onclick=${videoClick}>vid 1</li>
-        <li onclick=${videoClick}>vid 2</li>
-        <li onclick=${onYouTubeIframeAPIReady}>vid 3</li>
+        <li>vid 1</li>
+        <li>vid 2</li>
       </ul>
+
+    <script async src="https://www.youtube.com/iframe_api"></script>
     </body>
   `
 }
