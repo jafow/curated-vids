@@ -15,10 +15,12 @@
   "author": "Jared Fowler <jared.a.fowler@gmail.com> (@jafow)",
   "license": "MIT",
   "dependencies": {
-    "choo": "^6.5.1"
+    "choo": "^6.5.1",
+    "tachyons": "^4.9.0"
   },
   "devDependencies": {
     "bankai": "^9.0.0-rc9",
+    "choo-devtools": "^2.1.0",
     "eslint": "^4.10.0",
     "eslint-config-standard": "^10.2.1",
     "eslint-plugin-import": "^2.8.0",
