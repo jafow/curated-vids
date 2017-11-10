@@ -8,34 +8,46 @@ const YT_API_TOKEN = config.YT_API_TOKEN
 const YT_PLAYLIST_ID = config.YT_PLAYLIST_ID
 css('tachyons')
 // const header = css('./assets/styles/headers.css')
-const main = css('./assets/styles/main.css')
+// const main = css('./assets/styles/main.css', {global: true})
 const pf = css`
   :host {
     color: yellow;
   }`
 const pf2 = css`.friend { background: red; }`
+const prefix = css`
+  :host {
+    list-style: none;
+    font-weight: 600;
+    font-size: 18px;
+  }
+  :host > p {
+    color: pink;
+  }
+`
+
 app.use(require('choo-devtools')())
 app.use(initialState)
 app.use(getVideos)
+app.use(playVideo)
+
 app.route('/', mainView)
 app.mount('body')
 
 function mainView (state, emit) {
   var player
   if (!state.items) state.items = []
+  if (!state.currentVideo) state.currentVideo = ''
   window.onYouTubeIframeAPIReady = function onYouTubeIframeAPIReady () {
-    console.log('iddframe api read')
-    player = new YT.Player('player', {
+    player = new YT.Player('fart', {
       height: '390',
-      width: '640',
-      videoId: 'M7lc1UVf-VE',
+      width: '465',
+      videoId: state.currentVideo,
       events: {
-        'onReady': onPlayerReady,
+        'onReady': playOn,
         'onStateChange': onPlayerStateChange
       }
     })
   }
-
   function playOn () {
     player.playVideo()
   }
@@ -45,22 +57,35 @@ function mainView (state, emit) {
   function onPlayerStateChange () {
     console.log('player stae change')
   }
+  function play (evt) {
+    console.log('targ: ', evt.target.getAttribute('data-vidId'))
+    emit('playVideo', {vidId: evt.target.getAttribute('data-vidId')})
+  }
+
   return html`
     <body class=${pf2}>
       <h1 class=${pf2}>hello world</h1>
       <h2 class=${pf}>${state.message}</h2>
       <h3>${state.currentVideo}</h3>
       <ul>
-  ${state.items.map(function (vid) {
+  ${state.items.map(function vidItem (vid) {
     return html`
-        <li class=${main}>
-          <p>${vid.title}</p>
+        <li class=${prefix} onclick=${play}>
           <img src=${vid.thumbnail} data-vidId=${vid.videoId}/>
-        </li>`
+          <p>${vid.title}</p>
+        </li>
+      `
   })}
       </ul>
+      <div id="fart"></div>
+    <script>
+      var tag = document.createElement('script');
 
-    <script async src="https://www.youtube.com/iframe_api"></script>
+      tag.src = "https://www.youtube.com/iframe_api";
+      var firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    </script>
     </body>
   `
 }
@@ -69,6 +94,14 @@ function initialState (state, emitter) {
   state.message = 'holla mundo'
   emitter.on('videoClick', function (vidId) {
     state.currentVideo = vidId
+    emitter.emit('render')
+  })
+}
+
+function playVideo (state, emitter) {
+  emitter.on('playVideo', function (vidId) {
+    state.currentVideo = vidId
+    window.postMessage(JSON.stringify({type: 'butt', data: '**88**'}), '*')
     emitter.emit('render')
   })
 }
