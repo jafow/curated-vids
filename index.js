@@ -40,26 +40,16 @@ function mainView (state, emit) {
   window.onYouTubeIframeAPIReady = function onYouTubeIframeAPIReady () {
     player = new YT.Player('fart', {
       height: '390',
-      width: '465',
-      videoId: state.currentVideo,
-      events: {
-        'onReady': playOn,
-        'onStateChange': onPlayerStateChange
-      }
+      width: '465'
     })
   }
-  function playOn () {
-    player.playVideo()
-  }
-  function onPlayerReady (event) {
-    event.target.playVideo()
-  }
-  function onPlayerStateChange () {
-    console.log('player stae change')
-  }
+
   function play (evt) {
     console.log('targ: ', evt.target.getAttribute('data-vidId'))
-    emit('playVideo', {vidId: evt.target.getAttribute('data-vidId')})
+    emit('playVideo', {
+      vidId: evt.target.getAttribute('data-vidId'),
+      player: player
+    })
   }
 
   return html`
@@ -77,32 +67,24 @@ function mainView (state, emit) {
       `
   })}
       </ul>
-      <div id="fart"></div>
-    <script>
-      var tag = document.createElement('script');
-
-      tag.src = "https://www.youtube.com/iframe_api";
-      var firstScriptTag = document.getElementsByTagName('script')[0];
-      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-    </script>
+    <div id="fart"></div>
+    <script src="https://www.youtube.com/iframe_api" async></script>
     </body>
   `
 }
 
 function initialState (state, emitter) {
   state.message = 'holla mundo'
-  emitter.on('videoClick', function (vidId) {
-    state.currentVideo = vidId
-    emitter.emit('render')
-  })
 }
 
 function playVideo (state, emitter) {
-  emitter.on('playVideo', function (vidId) {
-    state.currentVideo = vidId
-    window.postMessage(JSON.stringify({type: 'butt', data: '**88**'}), '*')
-    emitter.emit('render')
+  emitter.on('playVideo', function (vid) {
+    state.currentVideo = vid.vidId
+    vid.player.loadVideoById({
+      videoId: vid.vidId,
+      startSeconds: 4,
+      suggestedQuality: 'medium'
+    })
   })
 }
 
