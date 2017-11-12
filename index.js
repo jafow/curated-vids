@@ -56,6 +56,7 @@ function mainView (state, emit) {
     <body class=${pf2}>
       <h1 class=${pf2}>hello world</h1>
       <h2 class=${pf}>${state.message}</h2>
+      <div id="fart" class=${state.currentVideo ? 'butt' : 'hide'}></div>
       <h3>${state.currentVideo}</h3>
       <ul>
   ${state.items.map(function vidItem (vid) {
@@ -67,7 +68,6 @@ function mainView (state, emit) {
       `
   })}
       </ul>
-    <div id="fart"></div>
     <script src="https://www.youtube.com/iframe_api" async></script>
     </body>
   `
