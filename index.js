@@ -24,8 +24,9 @@ const prefix = css`
     color: pink;
   }
 `
-
-app.use(require('choo-devtools')())
+if (process.env.NODE_ENV === 'dev') {
+  app.use(require('choo-devtools')())
+}
 app.use(initialState)
 app.use(getVideos)
 app.use(playVideo)
