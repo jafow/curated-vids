@@ -56,19 +56,28 @@ function getVideos (state, emitter) {
     json: true
   }
 
-  emitter.on('DOMContentLoaded', function () {
+  emitter.on('DOMContentLoaded', fetchVideos)
+
+  function fetchVideos () {
     state.items = []
     xhr(xhrOpts, (err, response, body) => {
-      if (err) throw new Error(err)
+      if (err) {
+        console.error(err)
+        emitter.emit('pushState', '/oops')
+      }
       if (response.statusCode < 400) {
         var contentType = response.headers['content-type']
         if (contentType && /application\/json/.test(contentType)) {
           state.items = body.items.map(formatItem)
           emitter.emit('render')
+        } else {
+          emitter.emit('pushState', '/oops')
         }
+      } else {
+        emitter.emit('pushState', '/oops')
       }
     })
-  })
+  }
 }
 
 function formatItem (item) {
