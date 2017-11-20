@@ -27,26 +27,19 @@ const prefix = css`
 if (process.env.NODE_ENV === 'dev') {
   app.use(require('choo-devtools')())
 }
-app.use(initialState)
 app.use(getVideos)
 app.use(playVideo)
 
 app.route('/', mainView)
+app.route('/vid/:vidId', require('./lib/play-video.js'))
 app.mount('body')
 
 function mainView (state, emit) {
   var player
   if (!state.items) state.items = []
   if (!state.currentVideo) state.currentVideo = ''
-  window.onYouTubeIframeAPIReady = function onYouTubeIframeAPIReady () {
-    player = new YT.Player('fart', {
-      height: '390',
-      width: '465'
-    })
-  }
 
   function play (evt) {
-    console.log('targ: ', evt.target.getAttribute('data-vidId'))
     emit('playVideo', {
       vidId: evt.target.getAttribute('data-vidId'),
       player: player
@@ -56,8 +49,6 @@ function mainView (state, emit) {
   return html`
     <body class=${pf2}>
       <h1 class=${pf2}>hello world</h1>
-      <h2 class=${pf}>${state.message}</h2>
-      <div id="fart" class=${state.currentVideo ? 'butt' : 'hide'}></div>
       <h3>${state.currentVideo}</h3>
       <ul>
   ${state.items.map(function vidItem (vid) {
@@ -69,23 +60,14 @@ function mainView (state, emit) {
       `
   })}
       </ul>
-    <script src="https://www.youtube.com/iframe_api" async></script>
     </body>
   `
 }
 
-function initialState (state, emitter) {
-  state.message = 'holla mundo'
-}
-
-function playVideo (state, emitter) {
+function playVideo (state, emitter, app) {
   emitter.on('playVideo', function (vid) {
     state.currentVideo = vid.vidId
-    vid.player.loadVideoById({
-      videoId: vid.vidId,
-      startSeconds: 4,
-      suggestedQuality: 'medium'
-    })
+    emitter.emit('pushState', `/vid/${state.currentVideo}`)
   })
 }
 
