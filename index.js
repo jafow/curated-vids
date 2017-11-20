@@ -1,7 +1,6 @@
-/* global YT, fetch, Headers */
-const html = require('choo/html')
 const choo = require('choo')
 const css = require('sheetify')
+const xhr = require('xhr')
 const app = choo()
 const config = require('./config.json')
 const YT_API_TOKEN = config.YT_API_TOKEN
@@ -38,7 +37,6 @@ function onVideoComplete (state, emitter) {
   })
 }
 function getVideos (state, emitter) {
-  var headers = new Headers()
   var maxResults = 25
   var playlistId = YT_PLAYLIST_ID
   var part = 'snippet%2CcontentDetails'
@@ -46,26 +44,25 @@ function getVideos (state, emitter) {
 
   var ytURL = 'https://www.googleapis.com/youtube/v3/playlistItems'
   var ytFetchURL = `${ytURL}?key=${key}&maxResults=${maxResults}&playlistId=${playlistId}&part=${part}`
-  var fetchInit = {
+  var xhrOpts = {
     method: 'GET',
-    headers: headers,
-    mode: 'cors',
-    cache: 'default'
+    sync: false,
+    url: ytFetchURL,
+    uri: ytFetchURL,
+    json: true
   }
 
   emitter.on('DOMContentLoaded', function () {
     state.items = []
-    fetch(ytFetchURL, fetchInit).then((response) => {
-      if (response.ok) {
-        let contentType = response.headers.get('content-type')
+    xhr(xhrOpts, (err, response, body) => {
+      if (err) throw new Error(err)
+      if (response.statusCode < 400) {
+        var contentType = response.headers['content-type']
         if (contentType && /application\/json/.test(contentType)) {
-          return response.json()
+          state.items = body.items.map(formatItem)
+          emitter.emit('render')
         }
       }
-    }).then((body) => {
-      let b = body
-      state.items = b.items.map(formatItem)
-      emitter.emit('render')
     })
   })
 }

@@ -16,7 +16,8 @@
   "license": "MIT",
   "dependencies": {
     "choo": "^6.5.1",
-    "tachyons": "^4.9.0"
+    "tachyons": "^4.9.0",
+    "xhr": "^2.4.0"
   },
   "devDependencies": {
     "bankai": "^9.0.0-rc9",
