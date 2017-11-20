@@ -7,19 +7,9 @@ const config = require('./config.json')
 const YT_API_TOKEN = config.YT_API_TOKEN
 const YT_PLAYLIST_ID = config.YT_PLAYLIST_ID
 css('tachyons')
-const header = css('./assets/styles/headers.css')
-const main = css('./assets/styles/main.css')
-const pf2 = css`.friend { background: red; }`
-const prefix = css`
-  :host {
-    list-style: none;
-    font-weight: 600;
-    font-size: 18px;
-  }
-  :host > p {
-    color: pink;
-  }
-`
+css('./assets/styles/headers.css')
+css('./assets/styles/main.css')
+
 if (process.env.NODE_ENV === 'dev') {
   app.use(require('choo-devtools')())
 }
@@ -27,39 +17,11 @@ app.use(getVideos)
 app.use(playVideo)
 app.use(onVideoComplete)
 
+const mainView = require('./lib/main.js')
+const playVideoView = require('./lib/play-video.js')
 app.route('/', mainView)
-app.route('/vid/:vidId', require('./lib/play-video.js'))
+app.route('/vid/:vidId', playVideoView)
 app.mount('body')
-
-function mainView (state, emit) {
-  var player
-  if (!state.items) state.items = []
-  if (!state.currentVideo) state.currentVideo = ''
-
-  function play (evt) {
-    emit('playVideo', {
-      vidId: evt.target.getAttribute('data-vidId'),
-      player: player
-    })
-  }
-
-  return html`
-    <body class=${pf2}>
-      <h1 class=${pf2}>hello world</h1>
-      <h3>${state.currentVideo}</h3>
-      <ul>
-  ${state.items.map(function vidItem (vid) {
-    return html`
-        <li class=${prefix} onclick=${play}>
-          <img src=${vid.thumbnail} data-vidId=${vid.videoId}/>
-          <p>${vid.title}</p>
-        </li>
-      `
-  })}
-      </ul>
-    </body>
-  `
-}
 
 function playVideo (state, emitter, app) {
   emitter.on('playVideo', function (vid) {
