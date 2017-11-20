@@ -7,12 +7,8 @@ const config = require('./config.json')
 const YT_API_TOKEN = config.YT_API_TOKEN
 const YT_PLAYLIST_ID = config.YT_PLAYLIST_ID
 css('tachyons')
-// const header = css('./assets/styles/headers.css')
-// const main = css('./assets/styles/main.css', {global: true})
-const pf = css`
-  :host {
-    color: yellow;
-  }`
+const header = css('./assets/styles/headers.css')
+const main = css('./assets/styles/main.css')
 const pf2 = css`.friend { background: red; }`
 const prefix = css`
   :host {
@@ -29,6 +25,7 @@ if (process.env.NODE_ENV === 'dev') {
 }
 app.use(getVideos)
 app.use(playVideo)
+app.use(onVideoComplete)
 
 app.route('/', mainView)
 app.route('/vid/:vidId', require('./lib/play-video.js'))
@@ -67,10 +64,17 @@ function mainView (state, emit) {
 function playVideo (state, emitter, app) {
   emitter.on('playVideo', function (vid) {
     state.currentVideo = vid.vidId
+    state.videoComplete = false
     emitter.emit('pushState', `/vid/${state.currentVideo}`)
   })
 }
 
+function onVideoComplete (state, emitter) {
+  emitter.on('video-complete', function (vid) {
+    state.videoComplete = true
+    emitter.emit('render')
+  })
+}
 function getVideos (state, emitter) {
   var headers = new Headers()
   var maxResults = 25

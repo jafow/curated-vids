@@ -1,3 +1,7 @@
 .vids {
     border: 2px solid pink;
 }
+.is-playing {
+    height: 390px;
+    width: 465px;
+}
