@@ -18,8 +18,12 @@ app.use(onVideoComplete)
 
 const mainView = require('./lib/main.js')
 const playVideoView = require('./lib/play-video.js')
+const oopsView = require('./lib/oops.js')
 app.route('/', mainView)
 app.route('/vid/:vidId', playVideoView)
+app.route('/oops', oopsView)
+app.route('*', oopsView)
+
 app.mount('body')
 
 function playVideo (state, emitter, app) {
